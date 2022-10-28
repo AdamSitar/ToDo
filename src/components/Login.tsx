@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import { AuthError } from "@supabase/supabase-js";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useUser } from "../context/user";
 import { loginSchema } from "../utils/schemas";
@@ -7,6 +8,7 @@ import ErrorBox from "./ErrorBox";
 
 const Login = () => {
   const { signup, login, logout } = useUser();
+  const [loginErr, setLoginErr] = useState<AuthError>();
 
   const {
     register,
@@ -37,13 +39,19 @@ const Login = () => {
 
         <ErrorBox errors={errors} />
       </div>
+      {loginErr && (
+        <div>
+          <p className="text-red-500">{loginErr.message}</p>
+        </div>
+      )}
       <div className="flex flex-row gap-2 w-full justify-center">
         <button
           className="rounded border grow"
           type="button"
-          onClick={handleSubmit(({ email, password }) =>
-            login(email, password)
-          )}
+          onClick={handleSubmit(async ({ email, password }) => {
+            const err = await login(email, password);
+            setLoginErr(err);
+          })}
         >
           Login
         </button>

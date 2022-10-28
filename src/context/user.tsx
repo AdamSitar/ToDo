@@ -59,6 +59,8 @@ const UserProvider: React.FC<IOwnProps> = ({ children }) => {
       email: email,
       password: pass,
     });
+    console.log("error", error?.message);
+    return error;
   };
 
   const logout = async () => {
