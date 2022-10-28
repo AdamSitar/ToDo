@@ -56,7 +56,6 @@ const Layout = () => {
         created_by: session?.user.email,
       })
       .select();
-    alert(error);
     !error && lists && setLists([...lists, res_data[0]]);
   };
 
