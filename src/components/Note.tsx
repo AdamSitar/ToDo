@@ -8,24 +8,19 @@ import IconButton from "./animation/IconButton";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon as UncheckedIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon as CheckedIcon } from "@heroicons/react/24/solid";
+import { Dispatch, SetStateAction } from "react";
 
 interface INoteComponent {
   note: INote;
+  removeNote: (id: string) => Promise<void>;
+  checkNote: (note: INote) => Promise<void>;
 }
 
-const removeNote = async (id: string) => {
-  const { error } = await supabase.from("note").delete().eq("id", id);
-};
-
-const checkNote = async (note: INote) => {
-  const { error } = await supabase
-    .from("note")
-    .update({ checked: !note.checked })
-    .eq("id", note.id);
-  error && console.log("up error", error);
-};
-
-const Note: React.FC<INoteComponent> = ({ note }) => {
+const Note: React.FC<INoteComponent> = ({
+  note,
+  removeNote,
+  checkNote,
+}) => {
   return (
     <li>
       <ExpandBox title={note.title}>
@@ -45,7 +40,10 @@ const Note: React.FC<INoteComponent> = ({ note }) => {
               }
               onClick={() => checkNote(note)}
             />
-            <IconButton icon={<XCircleIcon />} onClick={removeNote} />
+            <IconButton
+              icon={<XCircleIcon />}
+              onClick={() => removeNote(note.id)}
+            />
           </div>
         </div>
       </ExpandBox>

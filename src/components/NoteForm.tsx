@@ -2,31 +2,28 @@ import { AnimatePresence, motion } from "framer-motion";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useUser } from "../context/user";
+import { INote } from "../Layout";
 import { supabase } from "../utils/supabase";
 import ExpandBox from "./animation/ExpandBox";
 
-const NoteForm: React.FC<{ list_id: string }> = ({ list_id }) => {
+interface INoteFormProps {
+  createNote: (data: any) => Promise<void>;
+}
+
+const NoteForm: React.FC<INoteFormProps> = ({ createNote }) => {
   const { session } = useUser();
   const {
     register,
     handleSubmit,
-    watch,
+    reset,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = async (data: any) => {
-    console.log("data", data);
-    const { error } = await supabase.from("note").insert([
-      {
-        title: data.title,
-        description: data.description,
-        created_by: session?.user.email,
-        deadline: data.deadline,
-        list_id: list_id,
-      },
-    ]);
-    error && console.log("error", error);
+  const onSubmit = (data: any) => {
+    createNote(data);
+    reset();
   };
+
   return (
     <ExpandBox title="Create a new note">
       <form

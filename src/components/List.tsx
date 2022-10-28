@@ -1,89 +1,88 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { v4 as uuidv4 } from "uuid";
+import React, { useEffect, useState } from "react";
+import NoteForm from "./NoteForm";
+import { NoteList } from "./NoteList";
+import { IList, INote } from "../Layout";
+import { supabase } from "../utils/supabase";
+import { useUser } from "../context/user";
+import FilterButtons, { TFilterOption } from "./FilterButtons";
 
-// const Note = () => {
-//   return (
-//     <motion.li
-//       initial={{ opacity: 0, height: 0 }}
-//       animate={{ opacity: 1, height: "auto" }}
-//       exit={{ opacity: 0 }}
-//       className="border-b flex justify-between py-2"
-//       key={item}
-//       transition={{ layout: { duration: 2 } }}
-//       layout
-//     >
-//       <span>Item {item}</span>
-//       <button
-//         className="border rounded w-8 h-8"
-//         onClick={() => removeItem(item)}
-//       >
-//         &times;
-//       </button>
-//     </motion.li>
-//   );
-// };
-
-interface INote {
-  id: string;
+interface IOwnProps {
+  list: IList;
 }
 
-function List() {
-  const [notes, setNotes] = useState<Array<INote> | []>([]);
+const List: React.FC<IOwnProps> = ({ list }) => {
+  const { session } = useUser();
+  const [notes, setNotes] = useState<Array<INote> | null>(null);
+  const [filterState, setFilterState] = useState<
+    Array<TFilterOption | undefined>
+  >(["checked", "unchecked"]);
+  useEffect(() => {
+    const getData = async () => {
+      const { data: notes } = await supabase.from("note").select();
+      setNotes(notes);
+      return notes;
+    };
+    getData();
+  }, []);
 
-  function addItem() {
-    // if (items.map((item) => ) {
-    //   alert("Cannot post same note twice");
-    //   return;
-    // }
-    setNotes((notes) => [
-      ...notes,
-      {
-        id: uuidv4(),
-      },
-    ]);
-  }
-
-  function removeItem(id: string) {
-    setNotes((notes) =>
-      // notes.map((note) => note.id).filter((i) => i !== id)
-      [...notes.filter((note) => note.id !== id)]
-    );
-  }
-
-  return (
-    <div className="p-20">
-      <div className="flex justify-between">
-        <button
-          className="border rounded px-2 py-1"
-          onClick={() => addItem()}
-        >
-          Add
-        </button>
-      </div>
-      <ul className="mt-8 border overflow-hidden rounded p-8">
-        <AnimatePresence initial={false}>
-          {notes.map((note: INote) => (
-            <motion.li
-              key={note.id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="border-b flex items-center justify-between py-2"
-            >
-              <span>Id: {note.id}</span>
-              <button
-                className="border rounded w-8 h-8"
-                onClick={() => removeItem(note.id)}
-              >
-                &times;
-              </button>
-            </motion.li>
-          ))}
-        </AnimatePresence>
-      </ul>
-    </div>
+  const sortedData = notes?.filter((note) =>
+    filterState.includes(note.checked ? "checked" : "unchecked")
   );
-}
+
+  const createNote = async (data: any) => {
+    const new_note = {
+      title: data.title,
+      description: data.description,
+      created_by: session?.user.email,
+      checked: false,
+      deadline: data.deadline,
+      list_id: list.id,
+    };
+    const { data: res_data, error } = await supabase
+      .from("note")
+      .insert(new_note)
+      .select();
+    !error && notes && setNotes([...notes, res_data[0]]);
+  };
+
+  const removeNote = async (id: string) => {
+    const { error } = await supabase
+      .from("note")
+      .delete()
+      .eq("id", id);
+    !error &&
+      notes &&
+      setNotes([...notes.filter((note) => note.id !== id)]);
+  };
+
+  const checkNote = async (note: INote) => {
+    const { error } = await supabase
+      .from("note")
+      .update({ checked: !note.checked })
+      .eq("id", note.id);
+    !error &&
+      notes &&
+      setNotes(
+        notes.map((x) =>
+          x.id === note.id ? { ...x, checked: !note.checked } : x
+        )
+      );
+  };
+  return (
+    <li key={list.id} className="rounded border p-2 w-full">
+      <h1 className="text-xl">{list.title}</h1>
+      <FilterButtons
+        filterState={filterState}
+        setFilterState={setFilterState}
+      />
+      <NoteForm createNote={createNote} />
+      <NoteList
+        notes={sortedData}
+        removeNote={removeNote}
+        checkNote={checkNote}
+      />
+    </li>
+  );
+};
 
 export default List;

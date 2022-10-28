@@ -19,6 +19,17 @@ const variants = {
   },
 };
 
+const borderBoxVariants = {
+  open: {
+    opacity: 1,
+    x: 0,
+  },
+  closed: {
+    opacity: 0,
+    x: "-20px",
+  },
+};
+
 const ExpandBox: React.FC<{
   children: JSX.Element | Array<JSX.Element>;
   title: string;
@@ -26,36 +37,45 @@ const ExpandBox: React.FC<{
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="mt-2 flex flex-col border rounded p-2">
-      <div className="flex flex-row w-full justify-between">
-        <h1 className="">{title}</h1>
-        {expanded ? (
-          <IconButton
-            icon={<MinusCircleIcon />}
-            onClick={() => setExpanded(!expanded)}
-          />
-        ) : (
-          <IconButton
-            icon={<PlusCircleIcon />}
-            onClick={() => setExpanded(!expanded)}
-          />
-        )}
-      </div>
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            variants={variants}
-            style={{ overflow: "hidden" }}
-            initial="closed"
-            animate="open"
-            exit="closed"
-            transition={{ duration: 0.4, type: "spring" }}
-          >
-            {children}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    <AnimatePresence>
+      <motion.div
+        variants={borderBoxVariants}
+        initial="closed"
+        animate="open"
+        exit="closed"
+        transition={{ duration: 0.4, type: "spring" }}
+        className="mt-2 flex flex-col border rounded p-2 w-full"
+      >
+        <div className="flex flex-row w-full justify-between">
+          <h1 className="">{title}</h1>
+          {expanded ? (
+            <IconButton
+              icon={<MinusCircleIcon />}
+              onClick={() => setExpanded(!expanded)}
+            />
+          ) : (
+            <IconButton
+              icon={<PlusCircleIcon />}
+              onClick={() => setExpanded(!expanded)}
+            />
+          )}
+        </div>
+        <AnimatePresence>
+          {expanded && (
+            <motion.div
+              variants={variants}
+              style={{ overflow: "hidden" }}
+              initial="closed"
+              animate="open"
+              exit="closed"
+              transition={{ duration: 0.4, type: "spring" }}
+            >
+              {children}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 
