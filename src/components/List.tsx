@@ -7,6 +7,7 @@ import { useUser } from "../context/user";
 import FilterButtons, { TFilterOption } from "./FilterButtons";
 import IconButton from "./animation/IconButton";
 import { XCircleIcon } from "@heroicons/react/24/outline";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface IOwnProps {
   list: IList;
@@ -75,7 +76,7 @@ const List: React.FC<IOwnProps> = ({ list, removeList }) => {
   return (
     <li key={list.id} className="rounded border p-2 w-full">
       <div className="flex flex-row gap-2 items-center">
-        <h1 className="text-xl">{list.title}</h1>
+        <h1 className="text-xl mb-1">{list.title}</h1>
         <IconButton
           icon={<XCircleIcon />}
           onClick={() => removeList(list.id)}

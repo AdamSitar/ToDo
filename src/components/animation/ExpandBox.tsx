@@ -23,10 +23,17 @@ const borderBoxVariants = {
   open: {
     opacity: 1,
     x: 0,
+    height: "auto",
   },
-  closed: {
+  exit: {
     opacity: 0,
     x: "-20px",
+    height: 0,
+  },
+  initial: {
+    opacity: 0,
+    x: "-20px",
+    height: "auto",
   },
 };
 
@@ -40,9 +47,9 @@ const ExpandBox: React.FC<{
     <AnimatePresence>
       <motion.div
         variants={borderBoxVariants}
-        initial="closed"
+        initial="initial"
         animate="open"
-        exit="closed"
+        exit="exit"
         transition={{ duration: 0.4, type: "spring" }}
         className="mt-2 flex flex-col border rounded p-2 w-full"
       >

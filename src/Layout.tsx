@@ -5,6 +5,7 @@ import { supabase } from "./utils/supabase";
 import ListForm from "./components/ListForm";
 import List from "./components/List";
 import UserSection from "./components/UserSection";
+import { ListSchemaType } from "./utils/schemas";
 
 export interface INote {
   id: string;
@@ -47,6 +48,18 @@ const Layout = () => {
       setLists([...lists.filter((list) => list.id !== id)]);
   };
 
+  const createList = async (data: ListSchemaType) => {
+    const { data: res_data, error } = await supabase
+      .from("list")
+      .insert({
+        title: data.title,
+        created_by: session?.user.email,
+      })
+      .select();
+    alert(error);
+    !error && lists && setLists([...lists, res_data[0]]);
+  };
+
   return (
     <div className="p-8 sm:p-16 flex flex-col items-center">
       {!user ? (
@@ -55,7 +68,7 @@ const Layout = () => {
         <>
           <UserSection logout={logout} />
 
-          <ListForm />
+          <ListForm createList={createList} />
           <ul className="mt-2 w-full">
             {lists?.map((list) => (
               <List

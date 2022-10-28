@@ -1,14 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useUser } from "../context/user";
 import { listSchema, ListSchemaType } from "../utils/schemas";
-import { supabase } from "../utils/supabase";
 import ExpandBox from "./animation/ExpandBox";
 import ErrorBox from "./ErrorBox";
 
-const ListForm = () => {
-  const { session } = useUser();
+interface IListFormProps {
+  createList: (data: ListSchemaType) => Promise<void>;
+}
+
+const ListForm: React.FC<IListFormProps> = ({ createList }) => {
   const {
     register,
     handleSubmit,
@@ -17,19 +18,10 @@ const ListForm = () => {
     resolver: zodResolver(listSchema),
   });
 
-  const onSubmit = async (data: any) => {
-    const { error } = await supabase.from("list").insert([
-      {
-        title: data.title,
-        created_by: session?.user.email,
-      },
-    ]);
-  };
-
   return (
     <ExpandBox title="Create a new list">
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(createList)}
         className="flex flex-col gap-2 before:content-['']"
       >
         <input

@@ -1,6 +1,9 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useUser } from "../context/user";
+import { loginSchema } from "../utils/schemas";
+import ErrorBox from "./ErrorBox";
 
 const Login = () => {
   const { signup, login, logout } = useUser();
@@ -9,7 +12,9 @@ const Login = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+  });
 
   return (
     <form className="flex flex-col items-center mb-4 gap-2">
@@ -30,9 +35,7 @@ const Login = () => {
           className="border p-1"
         />
 
-        {errors.example && (
-          <span className="self-center">This field is required</span>
-        )}
+        <ErrorBox errors={errors} />
       </div>
       <div className="flex flex-row gap-2 w-full justify-center">
         <button
