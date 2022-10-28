@@ -1,23 +1,24 @@
-import { AnimatePresence, motion } from "framer-motion";
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
-import { useUser } from "../context/user";
-import { INote } from "../Layout";
-import { supabase } from "../utils/supabase";
 import ExpandBox from "./animation/ExpandBox";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import ErrorBox from "./ErrorBox";
+import { noteSchema, NoteSchemaType } from "../utils/schemas";
 
 interface INoteFormProps {
   createNote: (data: any) => Promise<void>;
 }
 
 const NoteForm: React.FC<INoteFormProps> = ({ createNote }) => {
-  const { session } = useUser();
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm<NoteSchemaType>({
+    resolver: zodResolver(noteSchema),
+  });
 
   const onSubmit = (data: any) => {
     createNote(data);
@@ -50,9 +51,7 @@ const NoteForm: React.FC<INoteFormProps> = ({ createNote }) => {
           className="border p-1"
         />
 
-        {(errors.title || errors.description) && (
-          <span className="self-center">This field is required</span>
-        )}
+        <ErrorBox errors={errors} />
 
         <input type="submit" className="border" />
       </form>

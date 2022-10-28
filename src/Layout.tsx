@@ -4,7 +4,7 @@ import { useUser } from "./context/user";
 import { supabase } from "./utils/supabase";
 import ListForm from "./components/ListForm";
 import List from "./components/List";
-import FilterButtons from "./components/FilterButtons";
+import UserSection from "./components/UserSection";
 
 export interface INote {
   id: string;
@@ -32,22 +32,37 @@ const Layout = () => {
     };
     getData();
   }, []);
+
+  const removeList = async (id: string) => {
+    const { error: noteError } = await supabase
+      .from("note")
+      .delete()
+      .eq("list_id", id);
+    const { error: listError } = await supabase
+      .from("list")
+      .delete()
+      .eq("id", id);
+    !listError &&
+      lists &&
+      setLists([...lists.filter((list) => list.id !== id)]);
+  };
+
   return (
     <div className="p-8 sm:p-16 flex flex-col items-center">
       {!user ? (
         <Login />
       ) : (
         <>
-          <button
-            className="border rounded w-full"
-            onClick={() => logout()}
-          >
-            logout
-          </button>
+          <UserSection logout={logout} />
+
           <ListForm />
           <ul className="mt-2 w-full">
             {lists?.map((list) => (
-              <List key={list.id} list={list} />
+              <List
+                key={list.id}
+                list={list}
+                removeList={removeList}
+              />
             ))}
           </ul>
         </>

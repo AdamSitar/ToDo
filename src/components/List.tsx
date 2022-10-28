@@ -5,17 +5,21 @@ import { IList, INote } from "../Layout";
 import { supabase } from "../utils/supabase";
 import { useUser } from "../context/user";
 import FilterButtons, { TFilterOption } from "./FilterButtons";
+import IconButton from "./animation/IconButton";
+import { XCircleIcon } from "@heroicons/react/24/outline";
 
 interface IOwnProps {
   list: IList;
+  removeList: (id: string) => Promise<void>;
 }
 
-const List: React.FC<IOwnProps> = ({ list }) => {
+const List: React.FC<IOwnProps> = ({ list, removeList }) => {
   const { session } = useUser();
   const [notes, setNotes] = useState<Array<INote> | null>(null);
   const [filterState, setFilterState] = useState<
     Array<TFilterOption | undefined>
   >(["checked", "unchecked"]);
+
   useEffect(() => {
     const getData = async () => {
       const { data: notes } = await supabase.from("note").select();
@@ -70,7 +74,14 @@ const List: React.FC<IOwnProps> = ({ list }) => {
   };
   return (
     <li key={list.id} className="rounded border p-2 w-full">
-      <h1 className="text-xl">{list.title}</h1>
+      <div className="flex flex-row gap-2 items-center">
+        <h1 className="text-xl">{list.title}</h1>
+        <IconButton
+          icon={<XCircleIcon />}
+          onClick={() => removeList(list.id)}
+        />
+      </div>
+
       <FilterButtons
         filterState={filterState}
         setFilterState={setFilterState}

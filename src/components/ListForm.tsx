@@ -1,27 +1,31 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useUser } from "../context/user";
+import { listSchema, ListSchemaType } from "../utils/schemas";
 import { supabase } from "../utils/supabase";
 import ExpandBox from "./animation/ExpandBox";
+import ErrorBox from "./ErrorBox";
 
 const ListForm = () => {
   const { session } = useUser();
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
-  } = useForm();
+  } = useForm<ListSchemaType>({
+    resolver: zodResolver(listSchema),
+  });
+
   const onSubmit = async (data: any) => {
-    console.log("data", data);
     const { error } = await supabase.from("list").insert([
       {
         title: data.title,
         created_by: session?.user.email,
       },
     ]);
-    error && console.log("error", error);
   };
+
   return (
     <ExpandBox title="Create a new list">
       <form
@@ -34,9 +38,7 @@ const ListForm = () => {
           className="border p-1"
         />
 
-        {errors.title && (
-          <span className="self-center">This field is required</span>
-        )}
+        <ErrorBox errors={errors} />
 
         <input type="submit" className="border" />
       </form>

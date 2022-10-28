@@ -1,30 +1,20 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { UserCtx, useUser } from "../context/user";
-import { supabase } from "../utils/supabase";
-import { useContext } from "react";
+import { useUser } from "../context/user";
 
 const Login = () => {
-  const { session, signup, login, logout } = useUser();
-  // const { session, signup, login, logout } = useContext(UserCtx);
-  const user = session?.user;
+  const { signup, login, logout } = useUser();
 
-  // const { user, signup, login, logout } = useUser();
-  console.log("session", session);
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
 
   return (
     <form className="flex flex-col items-center mb-4 gap-2">
       <div className="self-start w-full">
-        <p>
-          User logged in:
-          <span className="font-bold"> {user && user.email}</span>
-        </p>
+        <p>Log in, or sign up:</p>
       </div>
       <div className="flex flex-col gap-2 w-full">
         <input
@@ -57,7 +47,7 @@ const Login = () => {
         <button
           className="rounded border grow"
           type="button"
-          onClick={() => logout()}
+          onClick={() => logout && logout()}
         >
           Logout
         </button>

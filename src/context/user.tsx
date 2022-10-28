@@ -19,7 +19,7 @@ interface IUserContext {
   session: Session | null;
   signup: any;
   login: any;
-  logout: any;
+  logout: (() => Promise<void>) | undefined;
 }
 
 interface IOwnProps {
@@ -47,19 +47,11 @@ const UserProvider: React.FC<IOwnProps> = ({ children }) => {
     });
   }, []);
 
-  // useEffect(() => {
-  //   supabase.auth.onAuthStateChange(async () => {
-  //     const { data } = await supabase.auth.getUser();
-  //     setUser(data);
-  //   });
-  // }, []);
-
   const signup = async (email: string, pass: string) => {
     const { error } = await supabase.auth.signUp({
       email: email,
       password: pass,
     });
-    console.log("auth err", error);
   };
 
   const login = async (email: string, pass: string) => {
@@ -67,7 +59,6 @@ const UserProvider: React.FC<IOwnProps> = ({ children }) => {
       email: email,
       password: pass,
     });
-    error && console.log("login error", error);
   };
 
   const logout = async () => {

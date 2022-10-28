@@ -1,14 +1,12 @@
 import { format, parseISO } from "date-fns";
 import * as React from "react";
 import { INote } from "../Layout";
-import { supabase } from "../utils/supabase";
 import ExpandBox from "./animation/ExpandBox";
 import IconButton from "./animation/IconButton";
 
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon as UncheckedIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon as CheckedIcon } from "@heroicons/react/24/solid";
-import { Dispatch, SetStateAction } from "react";
 
 interface INoteComponent {
   note: INote;
