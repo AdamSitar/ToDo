@@ -60,7 +60,7 @@ const Layout = () => {
   };
 
   return (
-    <div className="p-8 sm:p-16 flex flex-col items-center">
+    <div className="flex flex-col items-center w-full">
       {!user ? (
         <Login />
       ) : (

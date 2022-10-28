@@ -31,7 +31,7 @@ const NoteForm: React.FC<INoteFormProps> = ({ createNote }) => {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-2 before:content-['']"
       >
-        <div className="flex flex-row justify-between gap-2">
+        <div className="flex flex-col md:flex-row justify-between gap-2">
           <input
             placeholder="title"
             {...register("title", { required: true })}
